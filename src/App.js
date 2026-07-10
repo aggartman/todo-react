@@ -26,6 +26,12 @@ function App() {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(todos))
   }, [todos])
 
+  function setTodosComplete(complete) {
+    setTodos((prevTodos) => {
+      return prevTodos.map((todo) => ({ ...todo, complete }))
+    })
+  }
+
   function handleKeyDown(e) {
     if (e.key === 'Enter') handleAddTodo()
     if (e.key === 'Escape') todoNameRef.current.value = ''
@@ -72,6 +78,15 @@ function App() {
 
   return (
     <>
+      <h1>Honey-Do List</h1>
+      <label>
+        <input
+          type="checkbox"
+          checked={todos.length > 0 && todos.every((todo) => todo.complete)}
+          onChange={(e) => setTodosComplete(e.target.checked)}
+        />
+        Mark All Complete
+      </label>
       <TodoList
         todos={todos}
         toggleTodo={toggleTodo}

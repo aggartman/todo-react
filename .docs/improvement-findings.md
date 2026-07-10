@@ -9,7 +9,7 @@ _Last reviewed: 2026-07-10_
 - [x] `toggleTodo` (`src/App.js`) mutates the found todo object in place (`todo.complete = !todo.complete`) before setting a shallow-copied array. Works today but breaks if we rely on immutability later (e.g. `React.memo`). Replace with a `.map()` that returns new objects.
 - [x] `handleAddTodo` (`src/App.js`) doesn't `.trim()` the input, so a string of only spaces gets added as a "blank" todo.
 - [x] `todoNameRef.current.value = null` (`src/App.js`) should be `''` — setting an input's value to `null` works but is a smell.
-- [ ] `JSON.parse(localStorage.getItem(...))` (`src/App.js`) has no try/catch — corrupted or missing localStorage data throws on load.
+- [x] `JSON.parse(localStorage.getItem(...))` (`src/App.js`) has no try/catch — corrupted or missing localStorage data throws on load.
 
 ## Missing core functionality
 

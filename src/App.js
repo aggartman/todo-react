@@ -8,8 +8,16 @@ function App() {
   const todoNameRef = useRef()
 
   useEffect(() => {
-    const storedTodos = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY))
-    if (storedTodos) setTodos(storedTodos)
+    const rawStorageTodos = localStorage.getItem(LOCAL_STORAGE_KEY)
+    if (!rawStorageTodos) return
+
+    try {
+      setTodos(JSON.parse(rawStorageTodosq))
+    } catch (error) {
+      console.error('Error parsing todos from localStorage: ', error)
+      console.log('Resetting todos')
+      localStorage.removeItem(LOCAL_STORAGE_KEY)
+    }
   }, [])
 
   useEffect(() => {
@@ -17,12 +25,12 @@ function App() {
   }, [todos])
 
   function handleAddTodo(e) {
-    const name = todoNameRef.current.value
+    const name = todoNameRef.current.value.trim()
     if (name === '') return
     setTodos((prevTodos) => {
       return [...prevTodos, { id: uuidv4(), name: name, complete: false }]
     })
-    todoNameRef.current.value = null
+    todoNameRef.current.value = ''
   }
 
   function handleClearTodo() {

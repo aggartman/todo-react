@@ -12,7 +12,7 @@ function App() {
     if (!rawStorageTodos) return
 
     try {
-      setTodos(JSON.parse(rawStorageTodosq))
+      setTodos(JSON.parse(rawStorageTodos))
     } catch (error) {
       console.error('Error parsing todos from localStorage: ', error)
       console.log('Resetting todos')

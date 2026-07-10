@@ -16,7 +16,7 @@ _Last reviewed: 2026-07-10_
 - [x] No delete button for individual todos (only bulk "Clear Complete").
 - [x] No edit-in-place for a todo's text.
 - [x] No "Add" on Enter key press — must click the button.
-- [ ] No "select/complete all" toggle.
+- [x] No "select/complete all" toggle.
 - [ ] No duplicate-todo check (optional, but common ask).
 
 ## UX / polish

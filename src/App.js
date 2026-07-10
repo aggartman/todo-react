@@ -26,6 +26,11 @@ function App() {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(todos))
   }, [todos])
 
+  function handleKeyDown(e) {
+    if (e.key === 'Enter') handleAddTodo()
+    if (e.key === 'Escape') todoNameRef.current.value = ''
+  }
+
   function handleAddTodo(e) {
     const name = todoNameRef.current.value.trim()
     if (name === '') return
@@ -80,7 +85,7 @@ function App() {
           onCancel={() => setEditingTodoId(null)}
         />
       )}
-      <input ref={todoNameRef} type="text" />
+      <input ref={todoNameRef} type="text" onKeyDown={handleKeyDown} />
       <button onClick={handleAddTodo}>Add Honey-Do</button>
       <button onClick={handleClearTodo}>Clear Complete</button>
       <div>{todos.filter((todo) => !todo.complete).length} left to do</div>

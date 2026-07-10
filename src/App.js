@@ -6,6 +6,7 @@ const LOCAL_STORAGE_KEY = 'honeydoApp.todos'
 function App() {
   const [todos, setTodos] = useState([])
   const todoNameRef = useRef()
+  const [editingTodoId, setEditingTodoId] = useState(null)
 
   useEffect(() => {
     const rawStorageTodos = localStorage.getItem(LOCAL_STORAGE_KEY)
@@ -46,9 +47,38 @@ function App() {
     })
   }
 
+  function handleEditTodo(id) {
+    setEditingTodoId(id)
+  }
+
+  function handleSaveEdit(id, newName) {
+    setTodos((prevTodos) =>
+      prevTodos.map((todo) =>
+        todo.id === id ? { ...todo, name: newName } : todo
+      )
+    )
+    setEditingTodoId(null)
+  }
+
+  function handleRemoveTodo(id) {
+    setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id))
+  }
+
   return (
     <>
-      <TodoList todos={todos} toggleTodo={toggleTodo} />
+      <TodoList
+        todos={todos}
+        toggleTodo={toggleTodo}
+        editTodo={handleEditTodo}
+        removeTodo={handleRemoveTodo}
+      />
+      {editingTodoId !== null && (
+        <EditTodoModal
+          todo={todos.find((todo) => todo.id === editingTodoId)}
+          onSave={handleSaveEdit}
+          onCancel={() => setEditingTodoId(null)}
+        />
+      )}
       <input ref={todoNameRef} type="text" />
       <button onClick={handleAddTodo}>Add Honey-Do</button>
       <button onClick={handleClearTodo}>Clear Complete</button>

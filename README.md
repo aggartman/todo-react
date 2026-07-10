@@ -1,4 +1,20 @@
-# Getting Started with Create React App
+# Todo React
+
+A simple todo list app built with React, used as a hands-on project for learning React fundamentals (hooks, lifting state, controlled/uncontrolled inputs, localStorage persistence).
+
+## Current status
+
+As it stands, the app supports:
+
+- Adding a new todo
+- Toggling a todo as complete/incomplete
+- Clearing all completed todos
+- A live count of remaining incomplete todos
+- Persisting todos to `localStorage` across page reloads
+
+There's no styling on the todo list yet, and some core features (deleting/editing individual todos, filtering by status) are still missing. See [`.docs/improvement-findings.md`](.docs/improvement-findings.md) for the running list of fixes, tweaks, and features planned next — that doc is updated as the app improves.
+
+## Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 

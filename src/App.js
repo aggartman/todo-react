@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import TodoList from './TodoList'
+import EditTodoModal from './EditTodoModal'
 
 const LOCAL_STORAGE_KEY = 'honeydoApp.todos'
 function App() {

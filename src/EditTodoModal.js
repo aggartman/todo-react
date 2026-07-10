@@ -1,4 +1,6 @@
-function EditTodoModal({ todo, onSave, onCancel }) {
+import { useState } from 'react'
+
+export default function EditTodoModal({ todo, onSave, onCancel }) {
   const [name, setName] = useState(todo.name)
 
   function handleSave() {

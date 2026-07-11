@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import TodoList from './TodoList'
 import EditTodoModal from './EditTodoModal'
+import './App.css'
 
 const LOCAL_STORAGE_KEY = 'honeydoApp.todos'
 function App() {
@@ -76,8 +77,11 @@ function App() {
     setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id))
   }
 
+  const activeTodos = todos.filter((todo) => !todo.complete)
+  const completeTodos = todos.filter((todo) => todo.complete)
+
   return (
-    <>
+    <div className="app">
       <h1 className="appTitle">Honey-Do List</h1>
       <label className="markAllLabel">
         <input
@@ -89,7 +93,7 @@ function App() {
         Mark All Complete
       </label>
       <TodoList
-        todos={todos}
+        todos={activeTodos}
         toggleTodo={toggleTodo}
         editTodo={handleEditTodo}
         removeTodo={handleRemoveTodo}
@@ -101,22 +105,33 @@ function App() {
           onCancel={() => setEditingTodoId(null)}
         />
       )}
-      <input
-        className="todoInput"
-        ref={todoNameRef}
-        type="text"
-        onKeyDown={handleKeyDown}
-      />
-      <button className="addTodoButton" onClick={handleAddTodo}>
-        Add Honey-Do
-      </button>
+      <div className="addTodoRow">
+        <input
+          className="todoInput"
+          ref={todoNameRef}
+          type="text"
+          onKeyDown={handleKeyDown}
+        />
+        <button className="addTodoButton" onClick={handleAddTodo}>
+          Add Honey-Do
+        </button>
+      </div>
       <button className="clearAllButton" onClick={handleClearTodo}>
         Clear Complete
       </button>
-      <div className="todosLeft">
-        {todos.filter((todo) => !todo.complete).length} left to do
-      </div>
-    </>
+      <div className="todosLeft">{activeTodos.length} left to do</div>
+      {completeTodos.length > 0 && (
+        <div className="completedSection">
+          <h2 className="completedHeading">Completed</h2>
+          <TodoList
+            todos={completeTodos}
+            toggleTodo={toggleTodo}
+            editTodo={handleEditTodo}
+            removeTodo={handleRemoveTodo}
+          />
+        </div>
+      )}
+    </div>
   )
 }
 

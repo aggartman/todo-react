@@ -78,9 +78,10 @@ function App() {
 
   return (
     <>
-      <h1>Honey-Do List</h1>
-      <label>
+      <h1 className="appTitle">Honey-Do List</h1>
+      <label className="markAllLabel">
         <input
+          className="markAllCheckbox"
           type="checkbox"
           checked={todos.length > 0 && todos.every((todo) => todo.complete)}
           onChange={(e) => setTodosComplete(e.target.checked)}
@@ -100,10 +101,21 @@ function App() {
           onCancel={() => setEditingTodoId(null)}
         />
       )}
-      <input ref={todoNameRef} type="text" onKeyDown={handleKeyDown} />
-      <button onClick={handleAddTodo}>Add Honey-Do</button>
-      <button onClick={handleClearTodo}>Clear Complete</button>
-      <div>{todos.filter((todo) => !todo.complete).length} left to do</div>
+      <input
+        className="todoInput"
+        ref={todoNameRef}
+        type="text"
+        onKeyDown={handleKeyDown}
+      />
+      <button className="addTodoButton" onClick={handleAddTodo}>
+        Add Honey-Do
+      </button>
+      <button className="clearAllButton" onClick={handleClearTodo}>
+        Clear Complete
+      </button>
+      <div className="todosLeft">
+        {todos.filter((todo) => !todo.complete).length} left to do
+      </div>
     </>
   )
 }

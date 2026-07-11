@@ -18,13 +18,18 @@ export default function EditTodoModal({ todo, onSave, onCancel }) {
     <div className="modal-backdrop" onClick={onCancel}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <input
+          className="modal-input"
           autoFocus
           value={name}
           onChange={(e) => setName(e.target.value)}
           onKeyDown={handleKeyDown}
         />
-        <button onClick={handleSave}>Confirm</button>
-        <button onClick={onCancel}>Cancel</button>
+        <button className="modal-confirm-button" onClick={handleSave}>
+          Confirm
+        </button>
+        <button className="modal-cancel-button" onClick={onCancel}>
+          Cancel
+        </button>
       </div>
     </div>
   )

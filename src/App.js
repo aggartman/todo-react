@@ -4,23 +4,28 @@ import TodoList from './TodoList'
 import EditTodoModal from './EditTodoModal'
 
 const LOCAL_STORAGE_KEY = 'honeydoApp.todos'
+
+function getLocalStorageTodos() {
+  const rawStorageTodos = localStorage.getItem(LOCAL_STORAGE_KEY)
+  if (!rawStorageTodos) return []
+  try {
+    const parsedTodos = JSON.parse(rawStorageTodos)
+    if (!Array.isArray(parsedTodos)) {
+      console.error('Todos in localStorage is not an array: ', parsedTodos)
+      return []
+    } else {
+      return parsedTodos
+    }
+  } catch (error) {
+    console.error('Error parsing todos from localStorage: ', error)
+    return []
+  }
+}
+
 function App() {
-  const [todos, setTodos] = useState([])
+  const [todos, setTodos] = useState(getLocalStorageTodos)
   const todoNameRef = useRef()
   const [editingTodoId, setEditingTodoId] = useState(null)
-
-  useEffect(() => {
-    const rawStorageTodos = localStorage.getItem(LOCAL_STORAGE_KEY)
-    if (!rawStorageTodos) return
-
-    try {
-      setTodos(JSON.parse(rawStorageTodos))
-    } catch (error) {
-      console.error('Error parsing todos from localStorage: ', error)
-      console.log('Resetting todos')
-      localStorage.removeItem(LOCAL_STORAGE_KEY)
-    }
-  }, [])
 
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(todos))

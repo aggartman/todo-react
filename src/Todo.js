@@ -15,19 +15,28 @@ export default function Todo({ todo, toggleTodo, removeTodo, editTodo }) {
   }
 
   return (
-    <div>
-      <label>
+    <div className="todo">
+      <label className="todoLabel">
         <input
+          className="todoCheckbox"
           type="checkbox"
           checked={todo.complete}
           onChange={handleTodoClick}
         />
-        {todo.name}
+        <span className="todoName">{todo.name}</span>
       </label>
-      <button onClick={handleEditClick} aria-label={`Edit ${todo.name}`}>
+      <button
+        className="editButton"
+        onClick={handleEditClick}
+        aria-label={`Edit ${todo.name}`}
+      >
         <FiFeather />
       </button>
-      <button onClick={handleRemoveClick} aria-label={`Remove ${todo.name}`}>
+      <button
+        className="removeButton"
+        onClick={handleRemoveClick}
+        aria-label={`Remove ${todo.name}`}
+      >
         <FiTrash2 />
       </button>
     </div>

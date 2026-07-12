@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import TodoList from './TodoList'
 import EditTodoModal from './EditTodoModal'
+import './App.css'
 
 const LOCAL_STORAGE_KEY = 'honeydoApp.todos'
 
@@ -81,11 +82,15 @@ function App() {
     setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id))
   }
 
+  const activeTodos = todos.filter((todo) => !todo.complete)
+  const completeTodos = todos.filter((todo) => todo.complete)
+
   return (
-    <>
-      <h1>Honey-Do List</h1>
-      <label>
+    <div className="app">
+      <h1 className="appTitle">Honey-Do List</h1>
+      <label className="markAllLabel">
         <input
+          className="markAllCheckbox"
           type="checkbox"
           checked={todos.length > 0 && todos.every((todo) => todo.complete)}
           onChange={(e) => setTodosComplete(e.target.checked)}
@@ -93,7 +98,7 @@ function App() {
         Mark All Complete
       </label>
       <TodoList
-        todos={todos}
+        todos={activeTodos}
         toggleTodo={toggleTodo}
         editTodo={handleEditTodo}
         removeTodo={handleRemoveTodo}
@@ -105,11 +110,33 @@ function App() {
           onCancel={() => setEditingTodoId(null)}
         />
       )}
-      <input ref={todoNameRef} type="text" onKeyDown={handleKeyDown} />
-      <button onClick={handleAddTodo}>Add Honey-Do</button>
-      <button onClick={handleClearTodo}>Clear Complete</button>
-      <div>{todos.filter((todo) => !todo.complete).length} left to do</div>
-    </>
+      <div className="addTodoRow">
+        <input
+          className="todoInput"
+          ref={todoNameRef}
+          type="text"
+          onKeyDown={handleKeyDown}
+        />
+        <button className="addTodoButton" onClick={handleAddTodo}>
+          Add Honey-Do
+        </button>
+      </div>
+      <button className="clearAllButton" onClick={handleClearTodo}>
+        Clear Complete
+      </button>
+      <div className="todosLeft">{activeTodos.length} left to do</div>
+      {completeTodos.length > 0 && (
+        <div className="completedSection">
+          <h2 className="completedHeading">Completed</h2>
+          <TodoList
+            todos={completeTodos}
+            toggleTodo={toggleTodo}
+            editTodo={handleEditTodo}
+            removeTodo={handleRemoveTodo}
+          />
+        </div>
+      )}
+    </div>
   )
 }
 

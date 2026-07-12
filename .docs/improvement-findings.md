@@ -4,7 +4,7 @@ Punch list of things to fix, tweak, or add to make this a fully functioning todo
 
 Each open item carries a **Skills** note: the concepts that item actually teaches. This project is a learning vehicle, so the skill payoff is a legitimate reason to pick one item over another, independent of how "important" the item is to the app.
 
-_Last reviewed: 2026-07-11_
+_Last reviewed: 2026-07-12_
 
 ## Bugs / correctness
 
@@ -26,15 +26,19 @@ _Last reviewed: 2026-07-11_
 
 ## UX / polish
 
-- [ ] Zero styling on the todo list/items — `App.css` is empty; needs actual layout (list items, checkbox alignment, strikethrough on complete, spacing).
+- [x] Zero styling on the todo list/items — `App.css` is empty; needs actual layout (list items, checkbox alignment, strikethrough on complete, spacing).
   - _Skills: CSS layout with flexbox/grid; scoping styles to components; the CSS-modules vs. plain-stylesheet vs. CSS-in-JS tradeoff._
+  - _Done: `ui-styling` branch, merged to `main` 2026-07-11. ~260 lines in `App.css` covering layout, the add-todo row, buttons, the todo grid, and the modal._
+- [x] No visual distinction (e.g., strikethrough/greyed text) for completed items.
+  - _Skills: driving CSS from state via conditional `className`; keeping visual state out of JS state._
+  - _Done differently than proposed: instead of strikethrough on the item, `App` now splits `todos` into `activeTodos` / `completeTodos` and renders completed ones under a separate "Completed" heading. Solves the "know at a glance what's done" problem by **separation** rather than by styling. Note the consequence: `Todo` still has no `complete`-conditional className, so if a per-item treatment is ever wanted, that work hasn't been done._
+- [ ] **The disabled Add button has no disabled styling.** `App.css` has `.addTodoButton` and `.addTodoButton:hover` but no `:disabled` rule, so with an empty input the button is genuinely disabled while still looking fully enabled — and it still lights up on hover. A control that looks clickable and isn't is worse than no disabled state at all. Needs `.addTodoButton:disabled { … }` and the hover rule narrowed to exclude it (`:hover:not(:disabled)`).
+  - _Skills: styling from element state with pseudo-classes rather than JS-toggled classes; **the real lesson — this bug was created by the merge itself.** `ui-styling` was written against a world with no disabled button; the controlled-input branch was written against a world with no CSS. Git resolved the conflict cleanly and still produced an incoherent result. "It compiles" is not verification._
 - [ ] No empty-state message when the list has zero todos.
   - _Skills: conditional rendering patterns (`&&` vs. ternary vs. early return) and the classic `0 &&` footgun in JSX._
-- [ ] No visual distinction (e.g., strikethrough/greyed text) for completed items.
-  - _Skills: driving CSS from state via conditional `className`; keeping visual state out of JS state._
-- [ ] No input placeholder text or focus state.
-  - _Skills: form affordances; `:focus-visible` and why it beats `:focus`._
-- [ ] No responsive/mobile layout.
+- [ ] No input placeholder text. (Focus state is now covered — `App.css` has `.todoInput:focus`. Worth revisiting whether `:focus-visible` is the better choice there.)
+  - _Skills: form affordances; `:focus-visible` and why it usually beats `:focus`._
+- [ ] No responsive/mobile layout — there is not a single `@media` query in `App.css` or `index.css`.
   - _Skills: media queries, mobile-first CSS, fluid sizing._
 
 ## Structure / code quality
@@ -46,14 +50,14 @@ _Last reviewed: 2026-07-11_
 - [x] Extract localStorage read/write into a small `useLocalStorage` custom hook — currently duplicated logic in two `useEffect`s in `App.js`. (Do this _after_ the lazy-initializer fix above; the hook should encapsulate both the seed-from-storage and the persist-on-change halves.)
   - _Skills: authoring **custom hooks**; recognizing that a hook is just a function that composes other hooks; designing a hook API that mirrors `useState`'s `[value, setValue]` shape._
   - _Done: `src/hooks/useLocalStorage.js`. Generic `(key, defaultValue, validate)` signature — the array-shape knowledge stays in `App` as an `Array.isArray` argument rather than being baked into the hook. Owns the lazy initializer, the parse/shape guards, the corrupt-key cleanup, and the persist effect. `App.js` no longer imports `useEffect` or references localStorage at all. Verified by hand: refresh restores todos; both malformed JSON and valid-JSON-wrong-shape fall back to an empty list without crashing._
-- [ ] **The add-todo input's state lives in `App`, so every keystroke re-renders the whole todo list.** Introduced deliberately by the controlled-input change above — the ref version caused zero re-renders while typing. Harmless at this size and *not* worth a `React.memo` band-aid. The real fix is to colocate: extract an `AddTodoForm` component that owns its own `name` state and takes an `onAdd(name)` prop, so typing only re-renders the form.
+- [ ] **The add-todo input's state lives in `App`, so every keystroke re-renders the whole todo list.** Introduced deliberately by the controlled-input change above — the ref version caused zero re-renders while typing. Harmless at this size and _not_ worth a `React.memo` band-aid. The real fix is to colocate: extract an `AddTodoForm` component that owns its own `name` state and takes an `onAdd(name)` prop, so typing only re-renders the form.
   - _Skills: **colocating state as low as it can go** — the actual first-line answer to re-render pressure, before memoization; using React DevTools' "highlight updates when components render" to see the problem instead of guessing at it; understanding why `React.memo`/`useCallback` are usually treating a symptom._
-- [ ] **`TodoList` renders a bare array of `<div>`s — no list semantics.** The component returns `todos.map(...)` directly with no wrapping element, and each `Todo` renders a `<div>`. Screen readers get no "list, 5 items" announcement. Should be a `<ul>` with `<li>` children.
-  - _Skills: semantic HTML and its accessibility payoff; what a component is allowed to return (arrays, fragments, `null`); when a Fragment (`<>`) is the right wrapper and when a real element is._
+- [ ] **`TodoList` renders `<div>`s — still no list semantics.** Since the `ui-styling` merge it wraps the items in `<div className="todoGrid">` and each `Todo` is a `<div className="todo">`. Screen readers still get no "list, 5 items" announcement. Should be a `<ul>` with `<li>` children. Note the merge made this slightly _more_ expensive to fix: `App.css` now has layout rules keyed to that div structure, so changing the elements means checking the CSS too (browsers apply default `list-style`/padding to `ul`, which will need resetting).
+  - _Skills: semantic HTML and its accessibility payoff; what a component is allowed to return (arrays, fragments, `null`); how presentational markup quietly calcifies — the longer a div-soup structure has CSS hanging off it, the more it costs to make semantic._
 - [ ] **`toggleTodo` / `editTodo` / `removeTodo` are prop-drilled `App` → `TodoList` → `Todo`.** `TodoList` doesn't use any of them; it only forwards them. That's tolerable at this depth but is the textbook motivation for `useReducer` (consolidate the five `setTodos` calls into one reducer) and, if drilling gets worse, Context.
   - _Skills: the **reducer pattern** (`useReducer`, actions, pure reducers) — a very natural fit if you're used to structured, transactional server-side logic; **Context** and, just as importantly, when Context is the *wrong* answer; recognizing prop drilling as a smell rather than reflexively fixing it._
-- [ ] No filter view (All / Active / Completed) — common baseline todo-app feature.
-  - _Skills: **derived state** — the filtered list should be computed during render, not stored in its own `useState`; `useMemo` and when it's actually warranted vs. cargo-culted._
+- [ ] No filter view (All / Active / Completed) — common baseline todo-app feature. Partially pre-empted by the `ui-styling` merge: `App` already derives `activeTodos` and `completeTodos` during render and shows both sections at once. A filter view would mean choosing _which_ section to show rather than computing it — so the derivation work is done and only the selected-filter state is missing. Worth deciding whether the always-both layout is actually better than a filter before building one.
+  - _Skills: **derived state** — the filtered list should be computed during render, not stored in its own `useState` (the merge already does this correctly); `useMemo` and when it's actually warranted vs. cargo-culted; noticing when a feature request has been overtaken by a design change._
 - [ ] No `id`/`htmlFor` pairing between checkbox and label. (Nesting the `<input>` inside the `<label>` is in fact valid and accessible, so this may be a non-issue — worth verifying with a screen reader or axe rather than changing on instinct.)
   - _Skills: reading the accessibility spec instead of guessing; using axe DevTools / Lighthouse to verify a11y claims._
 

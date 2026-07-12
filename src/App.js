@@ -1,36 +1,19 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
+import useLocalStorage from './hooks/useLocalStorage'
 import TodoList from './TodoList'
 import EditTodoModal from './EditTodoModal'
 import './App.css'
 
 const LOCAL_STORAGE_KEY = 'honeydoApp.todos'
-
-function getLocalStorageTodos() {
-  const rawStorageTodos = localStorage.getItem(LOCAL_STORAGE_KEY)
-  if (!rawStorageTodos) return []
-  try {
-    const parsedTodos = JSON.parse(rawStorageTodos)
-    if (!Array.isArray(parsedTodos)) {
-      console.error('Todos in localStorage is not an array: ', parsedTodos)
-      return []
-    } else {
-      return parsedTodos
-    }
-  } catch (error) {
-    console.error('Error parsing todos from localStorage: ', error)
-    return []
-  }
-}
-
 function App() {
-  const [todos, setTodos] = useState(getLocalStorageTodos)
-  const todoNameRef = useRef()
+  const [todos, setTodos] = useLocalStorage(
+    LOCAL_STORAGE_KEY,
+    [],
+    Array.isArray
+  )
+  const [name, setName] = useState('')
   const [editingTodoId, setEditingTodoId] = useState(null)
-
-  useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(todos))
-  }, [todos])
 
   function setTodosComplete(complete) {
     setTodos((prevTodos) => {
@@ -39,22 +22,21 @@ function App() {
   }
 
   function handleKeyDown(e) {
-    if (e.key === 'Enter') handleAddTodo()
-    if (e.key === 'Escape') todoNameRef.current.value = ''
+    if (e.key === 'Escape') setName('')
   }
 
   function handleAddTodo(e) {
-    const name = todoNameRef.current.value.trim()
-    if (name === '') return
+    e.preventDefault()
+    const todoName = name.trim()
+    if (todoName === '') return
     setTodos((prevTodos) => {
-      return [...prevTodos, { id: uuidv4(), name: name, complete: false }]
+      return [...prevTodos, { id: uuidv4(), name: todoName, complete: false }]
     })
-    todoNameRef.current.value = ''
+    setName('')
   }
 
   function handleClearTodo() {
-    const newTodos = todos.filter((todo) => !todo.complete)
-    setTodos(newTodos)
+    setTodos((prevTodos) => prevTodos.filter((todo) => !todo.complete))
   }
 
   function toggleTodo(id) {
@@ -110,17 +92,22 @@ function App() {
           onCancel={() => setEditingTodoId(null)}
         />
       )}
-      <div className="addTodoRow">
+      <form className="addTodoRow" onSubmit={handleAddTodo}>
         <input
           className="todoInput"
-          ref={todoNameRef}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           type="text"
           onKeyDown={handleKeyDown}
         />
-        <button className="addTodoButton" onClick={handleAddTodo}>
+        <button
+          className="addTodoButton"
+          type="submit"
+          disabled={name.trim() === ''}
+        >
           Add Honey-Do
         </button>
-      </div>
+      </form>
       <button className="clearAllButton" onClick={handleClearTodo}>
         Clear Complete
       </button>

@@ -55,7 +55,7 @@
 
 .todo:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(140, 115, 85, 0.25);
+  box-shadow: 0 6px 16px var(--color-box-shadow);
 }
 
 .todo:has(.todoCheckbox:checked) {
@@ -122,7 +122,7 @@
 }
 
 .removeButton:hover {
-  background-color: #f6d9c8;
+  background-color: var(--color-danger-muted);
   color: var(--color-danger);
 }
 
@@ -151,7 +151,7 @@
 .todoInput:focus,
 .modal-input:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(184, 121, 10, 0.2);
+  box-shadow: 0 0 0 3px var(--color-primary-ring);
 }
 
 .addTodoButton,
@@ -160,16 +160,26 @@
   border: none;
   border-radius: 10px;
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-surface);
   font-family: inherit;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    opacity 0.15s ease;
 }
 
-.addTodoButton:hover,
-.modal-confirm-button:hover {
+.addTodoButton:hover:not(:disabled),
+.modal-confirm-button:hover:not(:disabled) {
   background: var(--color-primary-dark);
+}
+
+.addTodoButton:disabled,
+.modal-confirm-button:disabled {
+  background-color: var(--color-primary-muted);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
 }
 
 .clearAllButton {
@@ -203,7 +213,7 @@
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(74, 52, 24, 0.45);
+  background: var(--color-modal-backdrop);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -220,7 +230,7 @@
   background: var(--color-surface);
   border-radius: 14px;
   padding: 1.5rem;
-  box-shadow: 0 12px 32px rgba(74, 52, 24, 0.3);
+  box-shadow: 0 12px 32px var(--color-modal-shadow);
 }
 
 .modal-input {
